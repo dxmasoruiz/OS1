@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -83,6 +84,30 @@ Process* dequeue(Queue *q) {
     }
     free(temp);
     return p;
+}
+
+void printQueue(Queue* queue) {
+    if (isQueueEmpty(queue)) {
+        printf("Queue is empty.\n");
+        return;
+    }
+
+    Queue* tempQueue = (Queue*)malloc(sizeof(Queue));
+    tempQueue->front = NULL;
+    tempQueue->rear = NULL;
+
+    while (!isQueueEmpty(queue)) {
+        Process* p = dequeue(queue);
+        printf("Process ID: %d, Arrival Time: %d, Duration: %d, Memory Needed: %d, Remaining Time: %d, In Memory: %s\n",
+               p->pid, p->arrival_time, p->duration, p->memory_needed, p->remaining_time, p->in_memory ? "Yes" : "No");
+        enqueue(tempQueue, p);
+    }
+
+    while (!isQueueEmpty(tempQueue)) {
+        enqueue(queue, dequeue(tempQueue));
+    }
+
+    free(tempQueue);
 }
 
 // ------------------ Memory Management ------------------
@@ -244,13 +269,15 @@ void print_process_stats(Process* p) {
 //-----------------------------------RR---------------------------------------------
 
 void roundRobin (Queue* processes){
-    int time =0;
+    int time =1;
     while (!isQueueEmpty(processes))
     {
         Process* current = dequeue(processes);
         if (current->arrival_time > time)
         {
-           enqueue(processes, current); 
+            printf("...\n");
+            
+            enqueue(processes, current); 
         }else {
         //if the process is not in memory, we try to load it
         if (current->in_memory == false)
@@ -269,7 +296,7 @@ void roundRobin (Queue* processes){
         if (current->in_memory==true) {
             printf("Simulating process %d\n", current->pid);
             current->remaining_time -= TIME_QUANTUM;
-            
+            time += TIME_QUANTUM;
             if (current->remaining_time <= 0)
             {
                 print_process_stats(current);
@@ -281,8 +308,8 @@ void roundRobin (Queue* processes){
         }
 
         }
+        time++;
         
-        time += TIME_QUANTUM;
 
     }
     
@@ -295,6 +322,7 @@ int main() {
     Queue *processes = createQueue();
     readProcesses(processes);
     processes = sortQueueByArrivalTime(processes);
+    printQueue(processes);
     roundRobin(processes);
     return 0;
 }
