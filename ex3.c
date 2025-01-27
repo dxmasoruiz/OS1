@@ -245,11 +245,15 @@ void print_process_stats(Process* p) {
 //-----------------------------------RR---------------------------------------------
 
 void roundRobin (Queue* processes){
-    
+    int time =0;
     while (!isQueueEmpty(processes))
     {
-        
         Process* current = dequeue(processes);
+        if (current->arrival_time > time)
+        {
+           
+           enqueue(processes, current); 
+        }else {
         //if the process is not in memory, we try to load it
         if (current->in_memory == false)
         {
@@ -267,6 +271,7 @@ void roundRobin (Queue* processes){
         if (current->in_memory==true) {
             printf("Simulating process %d\n", current->pid);
             current->remaining_time -= TIME_QUANTUM;
+            time += TIME_QUANTUM;
             if (current->remaining_time <= 0)
             {
                 print_process_stats(current);
@@ -276,6 +281,10 @@ void roundRobin (Queue* processes){
                 enqueue(processes, current);
             }
         }
+
+        }
+        
+        
 
     }
     
