@@ -301,6 +301,8 @@ void roundRobin (Queue* processes){
             {
                 print_process_stats(current);
                 release_memory(memory, current->pid);
+                free(current); 
+                current = NULL; 
             } else {
                 printf("Process %d has %d s remaining\n", current->pid, current->remaining_time);
                 enqueue(processes, current);
